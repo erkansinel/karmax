@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Karmax · Decisora</title>
+  <link rel="stylesheet" href="/statik/stil.css">
+</head>
+<body>
+  <header class="ust">
+    <div class="ust-ic">
+      <img src="/statik/decisora-logo.jpg" alt="Decisora Danışmanlık A.Ş." class="logo">
+      <div class="urun">
+        <span class="urun-adi">Karmax</span>
+        <span class="urun-alt">KOBİ finansal karar motoru</span>
+      </div>
+      <span class="baglanti" id="baglanti" data-durum="bekliyor">Sunucu kontrol ediliyor…</span>
+    </div>
+    <nav class="sekmeler" role="tablist" aria-label="Modüller">
+      <button role="tab" id="t-urun" aria-controls="p-urun" aria-selected="true">Ürün analizi</button>
+      <button role="tab" id="t-toplu" aria-controls="p-toplu" aria-selected="false">Toplu analiz (Excel)</button>
+      <button role="tab" id="t-fiyat" aria-controls="p-fiyat" aria-selected="false">Fiyat ve tahsilat riski</button>
+      <button role="tab" id="t-stok" aria-controls="p-stok" aria-selected="false">Stok ve maliyet</button>
+      <button role="tab" id="t-finansman" aria-controls="p-finansman" aria-selected="false">Finansman</button>
+    </nav>
+  </header>
+
+  <main class="icerik">
+    <!-- Ortak parametreler -->
+    <section class="kart parametreler" aria-labelledby="param-baslik">
+      <h2 id="param-baslik" class="kucuk-baslik">Paranın maliyeti <span class="ipucu">(bütün modüller için)</span></h2>
+      <div class="alanlar dar">
+        <label>Yıllık oran (%) <input id="yillik_oran_yuzde" type="number" step="any" value="40"></label>
+        <label>Faiz yöntemi
+          <select id="faiz_yontemi">
+            <option value="basit" selected>Basit faiz</option>
+            <option value="bilesik">Bileşik faiz</option>
+            <option value="efektif">Efektif yıllık faiz</option>
+          </select>
+        </label>
+        <label>Gün esası
+          <select id="gun_esasi"><option value="365" selected>365</option><option value="360">360</option></select>
+        </label>
+        <label>Bileşik dönem (yılda) <input id="bilesik_donem" type="number" step="1" value="12"></label>
+      </div>
+    </section>
+
+    <!-- ============================================================ ÜRÜN -->
+    <div class="panel" role="tabpanel" id="p-urun" aria-labelledby="t-urun">
+      <form id="form-urun" class="kart" novalidate>
+        <h2 class="kucuk-baslik">Ürün</h2>
+        <div class="alanlar">
+          <label>Ürün kodu <input id="urun_kodu" value="REF-001"></label>
+          <label>Ürün adı <input id="urun_adi" value="Referans ürün"></label>
+          <label>İlk alış maliyeti (TL) <input id="ilk_alis_maliyeti" type="number" step="any" value="100"></label>
+          <label>Bugünkü yeniden alış maliyeti (TL) <input id="yerine_koyma_maliyeti" type="number" step="any" value="120"></label>
+          <label>Satış fiyatı (TL, KDV hariç) <input id="satis_fiyati" type="number" step="any" value="130"></label>
+          <label>Satış miktarı <input id="satis_miktari" type="number" step="any" value="1"></label>
+          <label>Müşteri tahsilat vadesi (gün) <input id="tahsilat_vadesi_gun" type="number" step="1" value="90"></label>
+          <label>Tedarikçi ödeme vadesi (gün) <input id="tedarikci_vadesi_gun" type="number" step="1" value="0"></label>
+          <label>Ek gider, birim (TL) <input id="ek_gider_birim" type="number" step="any" value="0"></label>
+          <label>Hedef kâr oranı (%) <input id="hedef_kar_orani_yuzde" type="number" step="any" value="30"></label>
+        </div>
+        <div class="eylem">
+          <button type="submit">Hesapla ve kaydet</button>
+          <span class="durum" id="u-durum"></span>
+          <p class="hata" id="u-hata" role="alert" hidden></p>
+        </div>
+      </form>
+
+      <section class="kart" aria-labelledby="senaryo-baslik">
+        <div class="baslik-satir">
+          <h2 id="senaryo-baslik" class="kucuk-baslik">Canlı senaryo</h2>
+          <p class="ipucu">Çubukları kaydırdıkça sonuçlar güncellenir. Önizlemeler kaydedilmez.</p>
+        </div>
+        <div class="cubuklar">
+          <label class="cubuk"><span>Satış fiyatı <b id="c-fiyat-deger"></b></span>
+            <input type="range" id="c-fiyat" data-hedef="satis_fiyati" min="65" max="195" step="0.5" value="130"></label>
+          <label class="cubuk"><span>Müşteri vadesi <b id="c-vade-deger"></b></span>
+            <input type="range" id="c-vade" data-hedef="tahsilat_vadesi_gun" min="0" max="365" step="5" value="90"></label>
+          <label class="cubuk"><span>Yıllık oran <b id="c-oran-deger"></b></span>
+            <input type="range" id="c-oran" data-hedef="yillik_oran_yuzde" min="0" max="100" step="0.5" value="40"></label>
+        </div>
+      </section>
+
+      <section class="kart" id="u-sonuc" aria-live="polite" hidden>
+        <div class="ozet">
+          <div class="ozet-kutu"><span class="etiket">Muhasebe brüt kârı</span><span class="deger" id="o-brut"></span><span class="dip" id="o-brut-dip"></span></div>
+          <div class="ozet-kutu"><span class="etiket">Yeniden alış maliyetine göre</span><span class="deger" id="o-yk"></span><span class="dip">Zaman değeri hariç</span></div>
+          <div class="ozet-kutu vurgu"><span class="etiket">Ekonomik sonuç</span><span class="deger" id="o-eko"></span><span class="rozet" id="o-rozet"></span></div>
+        </div>
+        <dl class="karar">
+          <div><dt>Başabaş satış fiyatı</dt><dd id="k-basabas"></dd></div>
+          <div><dt>Hedef kâr için satış fiyatı</dt><dd id="k-hedef"></dd></div>
+          <div><dt>Verilebilecek en uzun vade</dt><dd id="k-vade"></dd></div>
+          <div><dt>Toplam ekonomik sonuç</dt><dd id="k-toplam"></dd></div>
+        </dl>
+      </section>
+
+      <section class="kart" id="u-grafikler" hidden>
+        <div class="grafik">
+          <h2>Kâr nereye gidiyor?</h2>
+          <p class="aciklama">Muhasebe kârından başlayıp malı yeniden almanın ve vadenin maliyetini düşüyoruz.</p>
+          <div id="g-selale" class="cizim" role="img" aria-label="Şelale grafiği"></div>
+        </div>
+        <div class="ikili">
+          <div class="grafik">
+            <h2>Vade uzadıkça tahsilat eriyor</h2>
+            <p class="aciklama">Mavi çizgi kesikli çizginin altına indiği anda satış zarara döner.</p>
+            <div id="g-vade" class="cizim" role="img" aria-label="Vade eğrisi"></div>
+          </div>
+          <div class="grafik">
+            <h2>Fiyat ne olmalı?</h2>
+            <p class="aciklama">Ekonomik sonucun satış fiyatına göre değişimi. Kırmızı bölge zarar.</p>
+            <div id="g-fiyat" class="cizim" role="img" aria-label="Fiyat ve başabaş grafiği"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="kart" id="u-detay" hidden>
+        <h2>Muhasebe kârından ekonomik sonuca</h2>
+        <div class="tablo-kap"><table>
+          <thead><tr><th>Kalem</th><th>Açıklama</th><th class="sag">Birim (TL)</th></tr></thead>
+          <tbody id="kopru"></tbody>
+        </table></div>
+        <h2>Varsayımlar</h2>
+        <ul class="varsayim" id="u-varsayimlar"></ul>
+      </section>
+    </div>
+
+    <!-- ============================================================ TOPLU -->
+    <div class="panel" role="tabpanel" id="p-toplu" aria-labelledby="t-toplu" hidden>
+      <section class="kart">
+        <h2 class="kucuk-baslik">Toplu ürün analizi</h2>
+        <ol class="adimlar">
+          <li><a class="dugme ikincil" href="/api/excel/sablon">Excel şablonunu indir</a> ve ürünlerini doldur.</li>
+          <li>Doldurduğun dosyayı seç. Paranın maliyeti, dosyanın <b>Parametreler</b> sayfasından okunur.</li>
+        </ol>
+        <form id="form-toplu" class="eylem" novalidate>
+          <label class="dosya-sec">
+            <input type="file" id="dosya" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          </label>
+          <button type="submit">Yükle ve analiz et</button>
+          <p class="hata" id="tp-hata" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <section class="kart" id="tp-sonuc" hidden>
+        <div class="ozet dortlu">
+          <div class="ozet-kutu"><span class="etiket">Toplam muhasebe brüt kârı</span><span class="deger" id="tp-muhasebe"></span><span class="dip" id="tp-urun-sayisi"></span></div>
+          <div class="ozet-kutu vurgu"><span class="etiket">Toplam ekonomik sonuç</span><span class="deger" id="tp-ekonomik"></span><span class="rozet" id="tp-rozet"></span></div>
+          <div class="ozet-kutu"><span class="etiket">Gizli fark</span><span class="deger" id="tp-fark"></span><span class="dip">Muhasebe kârı − ekonomik sonuç</span></div>
+          <div class="ozet-kutu"><span class="etiket">Ekonomik zarar eden ürün</span><span class="deger" id="tp-zarar"></span><span class="dip" id="tp-zarar-dip"></span></div>
+        </div>
+        <div class="eylem">
+          <a class="dugme" id="tp-indir" href="#">Sonuç Excel'ini indir</a>
+          <span class="durum" id="tp-durum"></span>
+        </div>
+        <div id="tp-uyarilar"></div>
+        <div class="grafik">
+          <h2>Ürünler: muhasebe kârı ve ekonomik sonuç</h2>
+          <p class="aciklama">Kötüden iyiye sıralı. İlk 25 ürün gösterilir; tamamı tabloda ve Excel'de.</p>
+          <div id="g-karsilastirma" class="cizim" role="img" aria-label="Ürün karşılaştırma grafiği"></div>
+        </div>
+        <h2>Sonuçlar</h2>
+        <div class="tablo-kap"><table>
+          <thead><tr><th>Ürün</th><th class="sag">Miktar</th><th class="sag">Muhasebe kârı (toplam)</th><th class="sag">Ekonomik sonuç (toplam)</th><th class="sag">Başabaş fiyatı</th><th class="sag">En uzun vade</th></tr></thead>
+          <tbody id="tp-tablo"></tbody>
+        </table></div>
+        <div id="tp-hatalar-blok" hidden>
+          <h2>Hatalı satırlar <span class="ipucu">(hesaplamaya alınmadı)</span></h2>
+          <div class="tablo-kap"><table>
+            <thead><tr><th>Excel satırı</th><th>Ürün kodu</th><th>Hata</th><th>Girilen değer</th></tr></thead>
+            <tbody id="tp-hatalar"></tbody>
+          </table></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============================================================ FİYAT -->
+    <div class="panel" role="tabpanel" id="p-fiyat" aria-labelledby="t-fiyat" hidden>
+      <form id="form-fiyat" class="kart" novalidate>
+        <h2 class="kucuk-baslik">Fiyat senaryoları</h2>
+        <p class="ipucu">Ürün bilgileri <b>Ürün analizi</b> sekmesinden alınır. O sekmedeki satış fiyatı peşin referans fiyattır.</p>
+        <div class="tablo-kap"><table class="duzenle">
+          <thead><tr><th>Senaryo adı</th><th>Satış fiyatı (TL)</th><th>Tahsilat vadesi (gün)</th><th></th></tr></thead>
+          <tbody id="fs-satirlar"></tbody>
+        </table></div>
+        <div class="eylem"><button type="button" class="ikincil" id="fs-ekle">Senaryo ekle</button>
+          <button type="button" class="ikincil" id="fs-varsayilan">Peşin / 30 / 60 / 90 güne dön</button></div>
+        <h2 class="kucuk-baslik">Tahsilat riski</h2>
+        <div class="alanlar dar">
+          <label>Müşterinin ödeme olasılığı (%) <input id="odeme_olasiligi_yuzde" type="number" step="any" value="100"></label>
+          <label>Beklenen gecikme (gün) <input id="beklenen_gecikme_gun" type="number" step="1" value="0"></label>
+        </div>
+        <div class="eylem">
+          <button type="submit">Senaryoları hesapla</button>
+          <span class="durum" id="fs-durum"></span>
+          <p class="hata" id="fs-hata" role="alert" hidden></p>
+        </div>
+      </form>
+      <section class="kart" id="fs-sonuc" hidden>
+        <p class="vurgu-metin" id="fs-en-iyi"></p>
+        <div class="grafik"><div id="g-senaryo" class="cizim" role="img" aria-label="Senaryo karşılaştırma grafiği"></div></div>
+        <div class="tablo-kap"><table>
+          <thead><tr><th>Senaryo</th><th class="sag">Fiyat</th><th class="sag">Vade</th><th class="sag">Ekonomik sonuç</th><th class="sag">Peşine eşdeğer fiyat</th><th class="sag">Gerekli vade farkı</th><th class="sag">Riskli sonuç</th><th class="sag">Riskli başabaş</th></tr></thead>
+          <tbody id="fs-tablo"></tbody>
+        </table></div>
+        <ul class="varsayim" id="fs-varsayimlar"></ul>
+      </section>
+    </div>
+
+    <!-- ============================================================ STOK -->
+    <div class="panel" role="tabpanel" id="p-stok" aria-labelledby="t-stok" hidden>
+      <form id="form-stok" class="kart" novalidate>
+        <h2 class="kucuk-baslik">Stok finansmanı</h2>
+        <div class="alanlar">
+          <label>Yıllık satılan malın maliyeti (TL) <input id="yillik_satilan_mal_maliyeti" type="number" step="any" value="12000000"></label>
+          <label>Ortalama stok tutarı (TL) <input id="ortalama_stok_tutari" type="number" step="any" value="2000000"></label>
+          <label>Taşıma maliyeti (stoğun yıllık %'si) <input id="tasima_maliyeti_orani_yuzde" type="number" step="any" value="5"></label>
+          <label>Karşılaştırılacak stok günleri <input id="alternatif_stok_gunleri" value="15, 30, 45, 60, 90"></label>
+        </div>
+        <div class="eylem">
+          <button type="submit">Stok analizini hesapla</button>
+          <span class="durum" id="st-durum"></span>
+          <p class="hata" id="st-hata" role="alert" hidden></p>
+        </div>
+      </form>
+      <section class="kart" id="st-sonuc" hidden>
+        <dl class="karar">
+          <div><dt>Stokta bekleme süresi</dt><dd id="st-gun"></dd></div>
+          <div><dt>Stok devir hızı</dt><dd id="st-devir"></dd></div>
+          <div><dt>Yıllık stok maliyeti</dt><dd id="st-maliyet"></dd></div>
+          <div><dt>Bir günlük stoğun yıllık maliyeti</dt><dd id="st-gunluk"></dd></div>
+        </dl>
+        <div class="grafik"><div id="g-stok" class="cizim" role="img" aria-label="Stok senaryoları grafiği"></div></div>
+        <div class="tablo-kap"><table>
+          <thead><tr><th>Stok günü</th><th class="sag">Ortalama stok</th><th class="sag">Yıllık maliyet</th><th class="sag">Yıllık tasarruf</th><th class="sag">Serbest kalan nakit</th></tr></thead>
+          <tbody id="st-tablo"></tbody>
+        </table></div>
+        <ul class="varsayim" id="st-varsayimlar"></ul>
+      </section>
+
+      <form id="form-maliyet" class="kart" novalidate>
+        <h2 class="kucuk-baslik">Parti maliyeti (FIFO / ağırlıklı ortalama)</h2>
+        <p class="ipucu">Aynı malı farklı fiyatlarla aldıysan, satılan malın birim maliyetini buradan bul ve ürün analizine aktar. Partileri eskiden yeniye yaz.</p>
+        <div class="tablo-kap"><table class="duzenle">
+          <thead><tr><th>Miktar</th><th>Birim maliyet (TL)</th><th></th></tr></thead>
+          <tbody id="pm-satirlar"></tbody>
+        </table></div>
+        <div class="eylem"><button type="button" class="ikincil" id="pm-ekle">Parti ekle</button></div>
+        <div class="alanlar dar">
+          <label>Satılan miktar <input id="satilan_miktar" type="number" step="any" value="150"></label>
+          <label>Yöntem
+            <select id="maliyet_yontemi"><option value="fifo" selected>FIFO (ilk giren ilk çıkar)</option><option value="agirlikli_ortalama">Ağırlıklı ortalama</option></select>
+          </label>
+          <label>Bugünkü birim alış fiyatı (TL) <input id="pm_yerine_koyma" type="number" step="any" value="120"></label>
+        </div>
+        <div class="eylem">
+          <button type="submit">Maliyeti hesapla</button>
+          <p class="hata" id="pm-hata" role="alert" hidden></p>
+        </div>
+        <div id="pm-sonuc" hidden>
+          <dl class="karar">
+            <div><dt>Satılan malın birim maliyeti</dt><dd id="pm-birim"></dd></div>
+            <div><dt>Stok değer değişimi</dt><dd id="pm-degisim"></dd></div>
+            <div><dt>Fiyat artışı</dt><dd id="pm-artis"></dd></div>
+            <div><dt>Kalan stok</dt><dd id="pm-kalan"></dd></div>
+          </dl>
+          <div class="eylem"><button type="button" class="ikincil" id="pm-aktar">Ürün analizine aktar</button><span class="durum" id="pm-durum"></span></div>
+        </div>
+      </form>
+    </div>
+
+    <!-- ======================================================= FİNANSMAN -->
+    <div class="panel" role="tabpanel" id="p-finansman" aria-labelledby="t-finansman" hidden>
+      <form id="form-erken" class="kart" novalidate>
+        <h2 class="kucuk-baslik">Erken ödeme iskontosu</h2>
+        <p class="ipucu">Tedarikçi "peşin öderseniz indirim, yoksa vadeli" diyorsa hangisi daha ucuz?</p>
+        <div class="alanlar dar">
+          <label>Fatura tutarı (TL) <input id="fatura_tutari" type="number" step="any" value="100000"></label>
+          <label>Peşin ödeme indirimi (%) <input id="iskonto_yuzde" type="number" step="any" value="2"></label>
+          <label>İndirimsiz ödeme vadesi (gün) <input id="vade_gun" type="number" step="1" value="60"></label>
+        </div>
+        <div class="eylem">
+          <button type="submit">Karşılaştır</button>
+          <p class="hata" id="eo-hata" role="alert" hidden></p>
+        </div>
+        <div id="eo-sonuc" hidden>
+          <p class="vurgu-metin" id="eo-karar"></p>
+          <dl class="karar">
+            <div><dt>Peşin ödeme</dt><dd id="eo-pesin"></dd></div>
+            <div><dt>Vadeli ödemenin bugünkü değeri</dt><dd id="eo-vadeli"></dd></div>
+            <div><dt>İndirimin örtük yıllık faizi</dt><dd id="eo-ortuk"></dd></div>
+            <div><dt>Efektif yıllık karşılığı</dt><dd id="eo-efektif"></dd></div>
+          </dl>
+        </div>
+      </form>
+
+      <form id="form-kredi" class="kart" novalidate>
+        <h2 class="kucuk-baslik">Finansman alternatifleri</h2>
+        <div class="tablo-kap"><table class="duzenle">
+          <thead><tr><th>Ad</th><th>Tür</th><th>Tutar (TL)</th><th>Yıllık faiz (%)</th><th>Vade (ay)</th><th>Peşin masraf (TL)</th><th></th></tr></thead>
+          <tbody id="kr-satirlar"></tbody>
+        </table></div>
+        <div class="eylem">
+          <button type="button" class="ikincil" id="kr-ekle">Alternatif ekle</button>
+          <button type="submit">Karşılaştır</button>
+          <span class="durum" id="kr-durum"></span>
+          <p class="hata" id="kr-hata" role="alert" hidden></p>
+        </div>
+      </form>
+      <section class="kart" id="kr-sonuc" hidden>
+        <p class="vurgu-metin" id="kr-ozet"></p>
+        <div class="grafik"><div id="g-finansman" class="cizim" role="img" aria-label="Finansman maliyeti grafiği"></div></div>
+        <div class="tablo-kap"><table>
+          <thead><tr><th>Alternatif</th><th class="sag">Net kullanılan</th><th class="sag">Toplam geri ödeme</th><th class="sag">Faiz + masraf</th><th class="sag">Efektif yıllık maliyet</th><th class="sag">Bugünkü değer maliyeti</th></tr></thead>
+          <tbody id="kr-tablo"></tbody>
+        </table></div>
+        <h2>Paranın maliyeti değişirse</h2>
+        <div class="tablo-kap"><table>
+          <thead id="kr-duyarlilik-bas"></thead>
+          <tbody id="kr-duyarlilik"></tbody>
+        </table></div>
+        <ul class="varsayim" id="kr-varsayimlar"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="alt">Karmax · Decisora Danışmanlık A.Ş. · <span id="surum"></span></footer>
+  <script src="/kutuphane/plotly.min.js"></script>
+  <script src="/statik/uygulama.js"></script>
+</body>
+</html>

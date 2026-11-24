@@ -1,0 +1,128 @@
+/* Karmax – Decisora renkleri logodan alınmıştır */
+:root {
+  --lacivert: #3f4d6e;
+  --lacivert-koyu: #33405d;
+  --arduvaz: #7d86a6;
+  --nane: #9edcd0;
+  --nane-koyu: #2f8f7f;
+  --bakir: #c9a28c;
+  --zemin: #f5f6f9;
+  --kart: #ffffff;
+  --yazi: #1f2638;
+  --yazi-2: #5a6380;
+  --cizgi: #e2e5ec;
+  --kayip: #c0444a;
+  --kayip-zemin: #fbeced;
+  --kazanc: #2f8f7f;
+  --kazanc-zemin: #e6f6f2;
+  --font: "Montserrat", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --rakam: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--zemin); color: var(--yazi); font-family: var(--font); font-size: 15px; line-height: 1.5; }
+[hidden] { display: none !important; }
+
+/* Üst bar ve sekmeler */
+.ust { background: var(--kart); border-bottom: 1px solid var(--cizgi); position: sticky; top: 0; z-index: 5; }
+.ust-ic { max-width: 1180px; margin: 0 auto; padding: 10px 20px 4px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.logo { height: 48px; width: auto; }
+.urun { display: flex; flex-direction: column; border-left: 2px solid var(--nane); padding-left: 14px; }
+.urun-adi { font-size: 22px; font-weight: 700; color: var(--lacivert); letter-spacing: .02em; line-height: 1.1; }
+.urun-alt { font-size: 13px; color: var(--yazi-2); }
+.baglanti { margin-left: auto; font-size: 13px; padding: 4px 10px; border-radius: 999px; background: var(--zemin); color: var(--yazi-2); }
+.baglanti[data-durum="ok"] { background: var(--kazanc-zemin); color: var(--kazanc); }
+.baglanti[data-durum="hata"] { background: var(--kayip-zemin); color: var(--kayip); }
+.sekmeler { max-width: 1180px; margin: 0 auto; padding: 0 12px; display: flex; gap: 2px; overflow-x: auto; }
+.sekmeler button { background: none; color: var(--yazi-2); border: 0; border-bottom: 3px solid transparent; border-radius: 0;
+  padding: 10px 14px; font-weight: 600; white-space: nowrap; }
+.sekmeler button:hover { color: var(--lacivert); background: none; }
+.sekmeler button[aria-selected="true"] { color: var(--lacivert); border-bottom-color: var(--nane-koyu); }
+
+.icerik { max-width: 1180px; margin: 0 auto; padding: 20px 20px 48px; display: grid; gap: 18px; }
+.panel { display: grid; gap: 18px; }
+.kart { background: var(--kart); border: 1px solid var(--cizgi); border-radius: 10px; padding: 20px; min-width: 0; }
+.parametreler { padding: 14px 20px; background: linear-gradient(0deg, var(--kart), var(--kart)); border-left: 4px solid var(--nane-koyu); }
+
+h2 { font-size: 17px; color: var(--lacivert); margin: 22px 0 10px; }
+.kucuk-baslik { margin: 0 0 12px; font-size: 16px; }
+.kart > h2:first-child, .grafik > h2:first-child { margin-top: 0; }
+.ipucu { color: var(--yazi-2); font-size: 13px; font-weight: 400; margin: 0 0 12px; }
+.baslik-satir { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.baslik-satir .ipucu { margin: 0; }
+
+/* Form */
+.alanlar { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px 16px; }
+.alanlar.dar { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--yazi-2); min-width: 0; }
+input, select { font: inherit; font-size: 15px; color: var(--yazi); padding: 8px 10px; border: 1px solid var(--cizgi);
+  border-radius: 6px; background: var(--kart); width: 100%; min-width: 0; }
+input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--nane-koyu); outline-offset: 1px; }
+.eylem { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+button, .dugme { font: inherit; font-weight: 600; font-size: 14px; color: #fff; background: var(--lacivert); border: 0;
+  border-radius: 6px; padding: 9px 18px; cursor: pointer; text-decoration: none; display: inline-block; }
+button:hover, .dugme:hover { background: var(--lacivert-koyu); }
+button:disabled { opacity: .6; cursor: progress; }
+button.ikincil, .dugme.ikincil { background: var(--kart); color: var(--lacivert); border: 1px solid var(--lacivert); padding: 8px 14px; }
+button.ikincil:hover, .dugme.ikincil:hover { background: var(--zemin); }
+button.sil { background: none; color: var(--yazi-2); border: 1px solid var(--cizgi); padding: 6px 10px; font-weight: 400; }
+button.sil:hover { color: var(--kayip); border-color: var(--kayip); background: none; }
+.hata { color: var(--kayip); margin: 0; font-size: 14px; flex-basis: 100%; }
+.durum { font-size: 13px; color: var(--yazi-2); }
+.eylem + .alanlar { margin-top: 16px; }
+.adimlar { margin: 0 0 8px; padding-left: 20px; display: grid; gap: 10px; }
+.dosya-sec input { padding: 6px; }
+
+/* Kaydırma çubukları */
+.cubuklar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 24px; }
+.cubuk span { display: flex; justify-content: space-between; gap: 8px; }
+.cubuk b { font-family: var(--rakam); color: var(--yazi); font-variant-numeric: tabular-nums; }
+input[type=range] { padding: 0; border: 0; accent-color: var(--lacivert); }
+
+/* Özet */
+.ozet { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.ozet.dortlu { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ozet-kutu { border: 1px solid var(--cizgi); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ozet-kutu.vurgu { border: 2px solid var(--lacivert); padding: 13px 15px; }
+.etiket { font-size: 13px; color: var(--yazi-2); }
+.deger { font-family: var(--rakam); font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.dip { font-size: 12px; color: var(--yazi-2); }
+.rozet { align-self: flex-start; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+.rozet.kayip { background: var(--kayip-zemin); color: var(--kayip); }
+.rozet.kazanc { background: var(--kazanc-zemin); color: var(--kazanc); }
+.neg { color: var(--kayip); }
+.poz { color: var(--kazanc); }
+.karar { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin: 14px 0 0; }
+.karar div { background: var(--zemin); border-radius: 8px; padding: 10px 14px; }
+.karar dt { font-size: 13px; color: var(--yazi-2); }
+.karar dd { margin: 2px 0 0; font-family: var(--rakam); font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.vurgu-metin { font-size: 16px; font-weight: 600; color: var(--lacivert); background: var(--kazanc-zemin); border-radius: 8px; padding: 10px 14px; margin: 0 0 12px; }
+.vurgu-metin.kotu { background: var(--kayip-zemin); color: var(--kayip); }
+.uyari { font-size: 13px; color: #8a5a00; background: #fff6e0; border-radius: 6px; padding: 8px 12px; margin: 12px 0 0; }
+
+/* Grafikler */
+.grafik { min-width: 0; }
+.ikili { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 8px; }
+.aciklama { color: var(--yazi-2); font-size: 14px; margin: 0 0 6px; }
+.cizim { width: 100%; min-height: 300px; }
+
+/* Tablolar */
+.tablo-kap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--cizgi); vertical-align: middle; }
+th { color: var(--yazi-2); font-weight: 600; font-size: 13px; white-space: nowrap; }
+td.sag, th.sag { text-align: right; font-family: var(--rakam); font-variant-numeric: tabular-nums; white-space: nowrap; }
+th.sag { font-family: var(--font); }
+tr.toplam td { font-weight: 700; border-top: 2px solid var(--lacivert); }
+table.duzenle td { padding: 6px 6px; }
+table.duzenle input, table.duzenle select { min-width: 110px; }
+.varsayim { margin: 16px 0 0; padding-left: 20px; color: var(--yazi-2); font-size: 13px; }
+.alt { text-align: center; font-size: 12px; color: var(--yazi-2); padding: 0 0 24px; }
+
+@media (max-width: 860px) {
+  .ozet, .ozet.dortlu, .ikili, .cubuklar { grid-template-columns: minmax(0, 1fr); }
+  .logo { height: 40px; }
+  .baglanti { margin-left: 0; }
+}
+@media (max-width: 1100px) and (min-width: 861px) {
+  .ozet.dortlu { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
