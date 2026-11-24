@@ -28,7 +28,7 @@ def istemci(tmp_path):
 def test_saglik(istemci):
     yanit = istemci.get("/api/saglik")
     assert yanit.status_code == 200
-    assert yanit.json() == {"durum": "ok", "motor_surumu": MOTOR_SURUMU}
+    assert yanit.json() == {"durum": "ok", "uygulama": "karmax", "motor_surumu": MOTOR_SURUMU}
 
 
 def test_urun_analizi_referans(istemci):

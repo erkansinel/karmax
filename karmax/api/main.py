@@ -139,7 +139,7 @@ def uygulama_olustur(veritabani_yolu: Path | str | None = None) -> FastAPI:
 
     @app.get("/api/saglik")
     def saglik() -> dict:
-        return {"durum": "ok", "motor_surumu": MOTOR_SURUMU}
+        return {"durum": "ok", "uygulama": "karmax", "motor_surumu": MOTOR_SURUMU}
 
     @app.get("/api/analizler/{kayit_id}")
     def analiz_getir(kayit_id: int) -> dict:

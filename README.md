@@ -9,7 +9,7 @@ Karmax, bir satışın muhasebe kârını yerine koyma maliyeti ve müşteri/ted
 1. Bilgisayarda **Python 3.11 veya üstü** kurulu olmalı. Yoksa [python.org](https://www.python.org/downloads/) adresinden kur ve kurulumun ilk ekranında **"Add python.exe to PATH"** kutusunu işaretle.
 2. Proje klasöründeki **`Karmax.bat`** dosyasına çift tıkla.
 
-İlk açılışta gerekli paketler kurulur (1–3 dakika, internet gerekir). Sonraki açılışlar birkaç saniye sürer. Tarayıcı kendiliğinden açılır.
+İlk açılışta gerekli paketler kurulur (1–3 dakika, internet gerekir). Sonraki açılışlar birkaç saniye sürer. Tarayıcı kendiliğinden **http://127.0.0.1:8737/** adresinde açılır. Bu port doluysa bir sonraki boş port kullanılır ve siyah pencerede yazar.
 
 Kapatmak için siyah pencereyi kapat. Karmax yalnızca bu bilgisayardan erişilebilir; ağa açılmaz.
 

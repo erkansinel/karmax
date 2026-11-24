@@ -60,7 +60,9 @@ Sayfanın en üstündeki **Paranın maliyeti** kutusu bütün modüller için ge
 
 **Karmax.bat açılıp hemen kapanıyor.** Pencerede bir hata mesajı kalır; en sık neden Python'un kurulu olmamasıdır. Mesajdaki adımları izle.
 
-**Tarayıcı açılmadı.** Siyah pencerede yazan adresi (ör. `http://127.0.0.1:8000/`) tarayıcına yaz.
+**Tarayıcı açılmadı.** Siyah pencerede yazan adresi tarayıcına yaz. Karmax'ın adresi normalde **`http://127.0.0.1:8737/`**'dir. Bu port doluysa bir sonraki boş port (8738, 8739…) kullanılır ve pencerede yazar.
+
+**Tarayıcıda başka bir program açıldı.** `http://127.0.0.1:8000/` gibi adresler başka projelerine ait olabilir. Karmax'ı her zaman `Karmax.bat` ile aç ya da siyah pencerede yazan adresi kullan.
 
 **Verilerim nerede?** Bütün analizler proje klasöründeki `veri\karmax.sqlite3` dosyasında. Bilgisayar dışına hiçbir veri gönderilmez.
 
